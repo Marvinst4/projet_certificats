@@ -4,15 +4,18 @@ def create_db():
     conn = sqlite3.connect("certificates.db")
     cursor = conn.cursor()
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS certificates (
+        CREATE TABLE certificates (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            domain TEXT,
+            version TEXT,
+            serial_number INTEGER,
             signature_algorithm TEXT,
-            issuer TEXT,
-            not_before INTEGER,
-            not_after INTEGER,
-            fingerprint TEXT
-        )
+            not_valid_before TEXT,
+            not_valid_after TEXT,
+            issuer_cn TEXT,
+            subject_cn TEXT,
+            modulus INTEGER,
+            exponent INTEGER
+        );
     ''')
     conn.commit()
     conn.close()
