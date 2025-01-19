@@ -8,34 +8,6 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
-def scrape_crt_sh(url):
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        outer_table = soup.find_all('table')[1] 
-        cert_table = outer_table.find('table') 
-
-        if not cert_table:
-            print("Aucun tableau contenant les certificats trouvé sur la page.")
-            return []
-
-        rows = cert_table.find_all('tr')
-        cert_ids = [] 
-      
-        for row in rows[2:]:  
-            cols = row.find_all('td')
-            if len(cols) >= 4:  
-                crt_id = cols[0].text.strip()
-                cert_ids.append(crt_id)  
-        return cert_ids
-
-    except Exception as e:
-        print(f"Erreur : {e}")
-        return []
-
 def download_pem(cert_id, output_filename):
     url = f'https://crt.sh/?d={cert_id}'
     try:
@@ -105,18 +77,12 @@ def download_and_extract(cert_id):
         download_pem(cert_id, output_filename)
 
     extract_data(output_filename)
-
-print("Récupération des ids des certificats...")
-url = "https://crt.sh/?identity=%25&iCAID=0001"
-cert_ids = scrape_crt_sh(url)
-
-
+    
 print("Démarrage des téléchargements...")
-failed_ids = []
-for cert_id in cert_ids:
+for cert_id in range(1, 100001):
     try:
         download_and_extract(cert_id)
     except Exception as e:
         print(f"Erreur inattendue lors du traitement de l'ID {cert_id} : {e}")
-        failed_ids.append(cert_id)
+
 print("Téléchargements terminés.")
